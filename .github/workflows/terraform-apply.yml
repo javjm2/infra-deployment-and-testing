@@ -95,9 +95,7 @@ jobs:
           ls -l
           kubectl apply -f ./webapp.yaml
           kubectl apply -f ./webapp-service-aws.yaml
-
-      - name: Write output to JSON
-        run: kubectl get svc webapp-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' > service-name.txt
+          kubectl get svc webapp-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' > service-name.txt
 
       - name: Upload outputs artifact
         uses: actions/upload-artifact@v4
