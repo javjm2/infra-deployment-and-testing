@@ -71,6 +71,8 @@ jobs:
           chmod +x kubectl
           mkdir -p ~/.local/bin
           mv ./kubectl ~/.local/bin/kubectl
+          sudo mv kubectl /usr/local/bin/
+          kubectl version --client
 
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -93,7 +95,6 @@ jobs:
           kubectl apply -f webapp-service.yaml
 
       - name: Write output to JSON
-        id: k8
         run: kubectl get svc webapp-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' > service-name.txt
 
       - name: Upload outputs artifact
