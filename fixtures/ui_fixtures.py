@@ -19,7 +19,9 @@ from selectors_file import Selector, Selectors
 
 SCREENSHOT_NAME = "test_screenshot.jpg"
 
-config = Config()
+@pytest.fixture(scope="session")
+def config():
+    return Config()
 
 @pytest.fixture
 def selectors():
@@ -77,7 +79,7 @@ def driver(request):
 
 
 @pytest.fixture
-def go_to_site(driver):
+def go_to_site(driver, config):
     driver.get(config.base_url)
 
 

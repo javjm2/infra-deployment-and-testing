@@ -4,9 +4,13 @@ import pytest
 import requests
 from utils.config import Config
 
-config = Config()
+
 @pytest.fixture(scope="session")
-def custom_requests():
+def config():
+    return Config()
+
+@pytest.fixture(scope="session")
+def custom_requests(config):
     def wrap():
         return config.config_requests()
 
@@ -14,7 +18,7 @@ def custom_requests():
 
 
 @pytest.fixture
-def base_url():
+def base_url(config):
     return config.base_url
 
 

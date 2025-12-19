@@ -98,7 +98,20 @@ jobs:
           aws eks --region eu-west-2 update-kubeconfig --name $CLUSTER_NAME
           kubectl apply -f ./k8/webapp.yaml
           kubectl apply -f ./k8/webapp-service.yaml
-          HOSTNAME=$(kubectl get svc webapp-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          echo "Waiting for LoadBalancer hostname..."
+          for i in {1..30}; do
+            HOSTNAME=$(kubectl get svc webapp-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+            if [ -n "$HOSTNAME" ]; then
+              break
+            fi
+            sleep 10
+          done
+          
+          if [ -z "$HOSTNAME" ]; then
+            echo "ERROR: LoadBalancer hostname not assigned"
+            exit 1
+          fi
+          
           echo "hostname=$HOSTNAME" >> $GITHUB_OUTPUT
           
 

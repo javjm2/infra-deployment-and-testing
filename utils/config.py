@@ -7,6 +7,8 @@ class Config(BaseSettings):
 
     @property
     def base_url(self) -> str:
+        if not self.HOSTNAME:
+            raise RuntimeError("HOSTNAME environment variable is not set")
         if self.HOSTNAME.startswith("http"):
             return self.HOSTNAME
         return f"http://{self.HOSTNAME}"
