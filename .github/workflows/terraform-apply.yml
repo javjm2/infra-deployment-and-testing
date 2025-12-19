@@ -49,6 +49,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: terraform
 
+    outputs:
+      hostname: ${{ steps.deploy_hostname.outputs.hostname }}
+
     container:
       image: ubuntu:22.04
 
@@ -87,6 +90,7 @@ jobs:
           echo "Here's the $CLUSTER_NAME"
 
       - name: Deploy to EKS Cluster
+        id: deploy_hostname
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -94,13 +98,20 @@ jobs:
           aws eks --region eu-west-2 update-kubeconfig --name $CLUSTER_NAME
           kubectl apply -f ./k8/webapp.yaml
           kubectl apply -f ./k8/webapp-service.yaml
-          echo "HOSTNAME=$(kubectl get svc webapp-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')" >> $GITHUB_ENV
+          HOSTNAME=$(kubectl get svc webapp-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          echo "hostname=$HOSTNAME" >> $GITHUB_OUTPUT
+          
 
   ui-tests:
+    name: Run the tests against the deployed app
     runs-on: ubuntu-latest
     needs: deploy
 
+    env:
+      HOSTNAME: ${{ needs.deploy.outputs.hostname }}
+
     steps:
+
       - name: Checkout test repo
         uses: actions/checkout@v4
 

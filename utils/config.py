@@ -3,7 +3,7 @@ import os
 from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
-    HOSTNAME: str = '127.0.0.1:62660'
+    HOSTNAME: str
 
     @property
     def base_url(self) -> str:
